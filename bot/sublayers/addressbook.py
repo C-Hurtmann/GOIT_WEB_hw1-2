@@ -1,3 +1,4 @@
+from abc import abstractmethod, ABC
 import pickle
 from collections import UserDict
 from datetime import datetime, timedelta
@@ -51,7 +52,7 @@ class AddressBook(UserDict):
             with open(self.file_name, 'rb') as f:
                 self.data = pickle.load(f)
         except:
-            return
+            print('Error')
 
 
 class Record:
@@ -450,6 +451,9 @@ class CommandsHandler:
             print(Style.BRIGHT + Fore.RED + f'Invalid command')
 
 
+class Output(ABC):
+    pass
+
 # ------------------------------------------------ADAPTER-------------------------------------------------------
 
 help = ('|You can use following commands:\n'
@@ -471,3 +475,9 @@ commands = {'add': CommandsHandler().add_contacts,
 
 CONFIG = ({'help': help,
            'commands': commands})
+
+
+if __name__ == '__main__':
+    ab = AddressBook()
+    ab.load_contacts()
+    print(ab.data)
