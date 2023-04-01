@@ -527,6 +527,7 @@ help = ('|You can use following commands:\n'
         '|back - Closing the sublayer\n')
 
 commands = {'add': CommandsHandler().add_contacts,
+            'help': CommandsHandler().get_help,
             'find': CommandsHandler().find_contacts,
             'show all': CommandsHandler().show_all_contacts,
             'get bith': CommandsHandler().birthday_contacts,
