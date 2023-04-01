@@ -4,7 +4,7 @@ from collections import UserDict
 from datetime import datetime, timedelta
 import re
 from colorama import init, Fore, Back, Style
-from prettytable import PrettyTable
+from prettytable import PrettyTable, ALL
 init(autoreset=True)
 
 
@@ -52,7 +52,7 @@ class AddressBook(UserDict):
             with open(self.file_name, 'rb') as f:
                 self.data = pickle.load(f)
         except:
-            print('Error')
+            return
 
 
 class Record:
@@ -169,6 +169,9 @@ class Field:
     @property
     def value(self):
         return self._value
+    
+    def __str__(self):
+        return f'{self._value}'
 
 
 class Name(Field):
@@ -193,6 +196,7 @@ class Phone(Field):
         a = re.match(pattern, phone)
         if a is not None:
             return phone
+    
 
 
 class Email(Field):
@@ -234,9 +238,18 @@ class CommandsHandler:
     """Needs for keeping AddressBook for all commands
        All methods of this class goes to commands dict in CONFIG
     """
-    address_book = AddressBook()
+    def __init__(self):
+        self.address_book = AddressBook()
+
+    def get_help(self):
+        """Shows all commands for the sublayer"""
+        help_string = HelpOutput()
+        help_string.create_header('You can use following commands:')
+        help_string.convert_data_to_table(commands)
+        print(help_string)
 
     def add_contacts(self):
+        """Add new contact"""
         user_name = input(Style.BRIGHT + Fore.BLUE + "Enter contact name: ")
         if not user_name:
             print("\033[4m\033[31m\033[45m{}\033[0m".format
@@ -275,8 +288,17 @@ class CommandsHandler:
                       f"Email: {rec_data['email']}, "
                       f"Birthday: {rec_data['birthday']},"
                       f"Home address: {rec_data['home_address']}|")
+    
+    def show_all(self):
+        """Shows the entire Address Book"""
+        data = self.address_book.data
+        table = AddressBookDataOutput()
+        table.create_header(['Name', 'Phones', 'Email', 'Birthday', 'Address'])
+        table.convert_data_to_table(data)
+        print(Fore.GREEN + str(table))
 
     def find_contacts(self):
+        """Find contact in Address Book"""
         find_user = input(Style.BRIGHT + Fore.BLUE +
                           'Enter contact name or phone: ')
         data = self.address_book.show_all_records()
@@ -309,6 +331,7 @@ class CommandsHandler:
                        'not found.'))
 
     def birthday_contacts(self):
+        """Show birthdays"""
         birth_user = int(input(Style.BRIGHT + Fore.BLUE +
                                'Enter a number of days: '))
         flag = False
@@ -333,6 +356,7 @@ class CommandsHandler:
                   ('There are no birthdays in this range!'))
 
     def change_contacts(self):
+        """Change contact"""
         change_user = input(Style.BRIGHT + Fore.CYAN + 'Enter contact name: ')
         data = self.address_book.show_all_records()
         if not data:
@@ -424,6 +448,7 @@ class CommandsHandler:
                       ("User not fount"))
 
     def remove_contacts(self):
+        """Delete contact from address book"""
         remove_commands = PrettyTable()
         remove_commands.field_names = ["Command entry", "Command value"]
         remove_commands.add_row(["del", "Delete one selected contact"])
@@ -449,10 +474,46 @@ class CommandsHandler:
             self.address_book.save_contacts()
         else:
             print(Style.BRIGHT + Fore.RED + f'Invalid command')
+    
+    def get_back(self):
+        """Back to main menu"""
+        pass
 
+class TableOutput(ABC):
 
-class Output(ABC):
-    pass
+    @abstractmethod
+    def create_header(self):
+        pass
+    
+    @abstractmethod
+    def convert_data_to_table(self):
+        pass
+
+class AddressBookDataOutput(TableOutput):
+    
+    def create_header(self, column_names: list):
+        self.table = PrettyTable(column_names)
+        self.table.hrules = ALL
+    
+    def convert_data_to_table(self, data):
+        for i in data.values():
+            phones = '\n'.join(map(str, i.phones))
+            self.table.add_row([i.name, phones, i.email, i.birthday, i.home_address])
+    
+    def __str__(self):
+        return f'{self.table}'
+    
+class HelpOutput(TableOutput):
+    
+    def create_header(self, welcome_string):
+        self.table = [welcome_string]
+
+    def convert_data_to_table(self, commands):
+        for k, v in commands.items():
+            self.table.append(f'|{k} - {v.__doc__}')
+
+    def __str__(self):
+        return '\n'.join(self.table)
 
 # ------------------------------------------------ADAPTER-------------------------------------------------------
 
@@ -471,13 +532,12 @@ commands = {'add': CommandsHandler().add_contacts,
             'get bith': CommandsHandler().birthday_contacts,
             'change': CommandsHandler().change_contacts,
             'del': CommandsHandler().remove_contacts,
-            'back': ...}
+            'back': CommandsHandler().get_back}
 
 CONFIG = ({'help': help,
            'commands': commands})
 
 
 if __name__ == '__main__':
-    ab = AddressBook()
-    ab.load_contacts()
-    print(ab.data)
+    CommandsHandler().get_help()
+    CommandsHandler().show_all()
