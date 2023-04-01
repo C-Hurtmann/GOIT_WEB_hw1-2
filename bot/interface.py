@@ -1,8 +1,8 @@
 import inquirer
 
-from sublayers.addressbook import CONFIG as ab_config
-from sublayers.notebook import CONFIG as nb_config
-from sublayers.cleaner import CONFIG as sa_config
+from sublayers.addressbook import commands as ab_commands
+from sublayers.notebook import commands as nb_commands
+from sublayers.cleaner import commands as sa_commands
 from sublayers.handler import Handler
 
 
@@ -23,15 +23,15 @@ def main():
         main_choice = inquirer.prompt(main_menu)['option']
 
         if main_choice == 'Address Book':
-            handler = Handler(**ab_config)
+            handler = Handler(ab_commands)
             handler.run()
 
         elif main_choice == 'Note Book':
-            handler = Handler(**nb_config)
+            handler = Handler(nb_commands)
             handler.run()
 
         elif main_choice == 'Sorter Assist':
-            handler = Handler(**sa_config)
+            handler = Handler(sa_commands)
             handler.run()
         elif main_choice == 'Exit':
             print("Exiting program...")
