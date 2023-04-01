@@ -2,6 +2,8 @@ import pickle
 from collections import UserDict
 from colorama import Fore, Style, init
 from prettytable import PrettyTable
+
+from addressbook import TableOutput, HelpOutput
 init(autoreset=True)
 
 
@@ -104,6 +106,9 @@ class Field:
     @property
     def value(self):
         return self._value
+    
+    def __str__(self):
+        return f'{self._value}'
 
 
 class Title(Field):
@@ -143,6 +148,7 @@ class CommandsHandler:
     notebook = Notebook()
 
     def add_note(self):
+        """add a new note in Notebook"""
         user_title = input(Style.BRIGHT + Fore.BLUE + "Enter a title: ")
         record = Record(title=user_title)
         record.create_title(record=record, user_title=user_title)
@@ -152,6 +158,13 @@ class CommandsHandler:
         record.create_tag(record=record, user_tag=user_tag)
         self.notebook.add_record(record)
         self.notebook.save_notes()
+        
+    def get_help(self):
+        """Shows all commands for the sublayer"""
+        help_string = HelpOutput()
+        help_string.create_header('You can use following commands:')
+        help_string.convert_data_to_table(commands)
+        print(help_string)
 
     def show_all_notes(self):
         data = self.notebook.show_all_records()
@@ -164,8 +177,17 @@ class CommandsHandler:
                 print(Fore.GREEN + f"|Title: {title}\n"
                       f"|Text: {rec_data['text']}\n"
                       f"|Tag: {rec_data['#tag']}\n")
+                
+    def show_all(self):
+        """shows the entire Notebook"""
+        data = self.notebook.data
+        table = NoteBookDataOutput()
+        table.create_header(['Title', 'Text', 'Tags'])
+        table.convert_data_to_table(data)
+        print(table)
 
     def find_note(self):
+        """find note in Notebook"""
         find_user = input(Style.BRIGHT+Fore.BLUE + 'Enter title or #tag: ')
         data = self.notebook.show_all_records()
         if not data:
@@ -193,6 +215,7 @@ class CommandsHandler:
                       'Note with this title or #tag was not found.')
 
     def sort_notes_by_tag(self):
+        """sorts notes by tags in Notebook"""
         notes_tag = []
         notes_without_tag = []
         for name, record in self.notebook.items():
@@ -210,6 +233,7 @@ class CommandsHandler:
                                f"|Tag: {rec_data['#tag']}\n")
 
     def change_note(self):
+        """change a note in Notebook"""
         change_user = input(Style.BRIGHT + Fore.CYAN + 'Enter title of note: ')
         data = self.notebook.show_all_records()
         if not data:
@@ -282,6 +306,7 @@ class CommandsHandler:
                 self.notebook.save_notes()
 
     def remove_note(self):
+        """delete a note from Notebook"""
         remove_commands = PrettyTable()
         remove_commands.field_names = ["Command entry", "Command value"]
         remove_commands.add_row(["del", "Delete one selected note"])
@@ -304,8 +329,24 @@ class CommandsHandler:
             elif question == 'y':
                 self.notebook.data.clear()
         self.notebook.save_notes()
+        
+    def get_back(self):
+        """Back to main menu"""
+        pass
 
 
+class NoteBookDataOutput(TableOutput):
+    
+    def create_header(self, column_names):
+        self.table = PrettyTable(column_names)
+    
+    def convert_data_to_table(self, data):
+        for i in data.values():
+            tags ='\n'.join(map(str, i.tags))
+            self.table.add_row([i.title, i.text, tags])
+    
+    def __str__(self):
+        return f'{self.table}'
 # ------------------------------------------------ADAPTER-------------------------------------------------------
 help = ('|You can use following commands:\n'
         '|add - add a new note in Notebook\n'
@@ -317,12 +358,18 @@ help = ('|You can use following commands:\n'
         '|back - Closing the sublayer\n')
 
 commands = {'add': CommandsHandler().add_note,
+            'help': CommandsHandler().get_help,
             'del': CommandsHandler().remove_note,
             'change': CommandsHandler().change_note,
             'find': CommandsHandler().find_note,
             'tag sort': CommandsHandler().sort_notes_by_tag,
-            'show all': CommandsHandler().show_all_notes,
-            'back': ...}
+            'show all': CommandsHandler().show_all,
+            'back': CommandsHandler().get_back}
 
 CONFIG = ({'help': help,
            'commands': commands})
+
+if __name__ == '__main__':
+    CommandsHandler().get_help()
+    CommandsHandler().show_all()
+    

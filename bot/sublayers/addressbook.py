@@ -488,7 +488,10 @@ class TableOutput(ABC):
     @abstractmethod
     def convert_data_to_table(self):
         pass
-
+    
+    @abstractmethod
+    def __str__(self):
+        pass
 class AddressBookDataOutput(TableOutput):
     
     def create_header(self, column_names: list):
@@ -529,7 +532,7 @@ help = ('|You can use following commands:\n'
 commands = {'add': CommandsHandler().add_contacts,
             'help': CommandsHandler().get_help,
             'find': CommandsHandler().find_contacts,
-            'show all': CommandsHandler().show_all_contacts,
+            'show all': CommandsHandler().show_all,
             'get bith': CommandsHandler().birthday_contacts,
             'change': CommandsHandler().change_contacts,
             'del': CommandsHandler().remove_contacts,
