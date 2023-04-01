@@ -3,6 +3,8 @@ import shutil
 from pathlib import Path
 from colorama import init, Fore
 
+from sublayers.addressbook import HelpOutput
+
 init(autoreset=True)
 
 extensions = {'video': ['mp4', 'mov', 'avi', 'mkv'],
@@ -134,7 +136,7 @@ def remove_empty_folders(main_path, level = 1):
 
 
 def sort():
-    '''takes the path, runs the functons and outputs a report of the work done'''
+    '''Sorting the folder'''
     try:
         main_path = input(Fore.MAGENTA + "Enter path for folder: ")
         create_folders_from_list(main_path, extensions)
@@ -150,7 +152,16 @@ def sort():
     except FileNotFoundError:
             print(Fore.LIGHTRED_EX + "The path was wroning. Try again")
 
+def get_help():
+    '''Shows all commands for the sublayer'''
+    help_string = HelpOutput()
+    help_string.create_header('You can use following commands:')
+    help_string.convert_data_to_table(commands)
+    print(help_string)
 
+def get_back():
+    '''Closing the sublayer'''
+    pass
 # ------------------------------------------------ADAPTER-------------------------------------------------------
 
 help = ('|You can use following commands:\n'
@@ -158,7 +169,8 @@ help = ('|You can use following commands:\n'
         '|back - Closing the sublayer\n')
 
 commands = {'sort': sort,
-            'back': ...}
+            'help': get_help,
+            'back': get_back}
 
 
 CONFIG = ({'help': help,
