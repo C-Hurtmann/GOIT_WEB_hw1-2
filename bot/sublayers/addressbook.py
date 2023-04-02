@@ -28,17 +28,6 @@ class AddressBook(UserDict):
     def show_all_records(self):
         return self.data
 
-    def iterate(self, n=1):
-        """Shows n Records in AddressBook
-
-        Args:
-            n (int, optional): Number of Records needs to show. Defaults to 1
-        """
-        for key, _ in self.data.items():
-            d_list = list(self.data.values())
-            for i in range(0, len(d_list), n):
-                yield key, d_list[i:i + n]
-
     def add_record(self, record):
         self.data[record.name.value] = record
 

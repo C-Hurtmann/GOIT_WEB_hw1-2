@@ -26,12 +26,6 @@ class Notebook(UserDict):
     def show_all_records(self):
         return self.data
 
-    def iterate(self, n=1):
-        for key, _ in self.data.items():
-            d_list = list(self.data.values())
-            for i in range(0, len(d_list), n):
-                yield key, d_list[i:i + n]
-
     def add_record(self, record):
         self.data[record.title.value] = record
 
@@ -165,18 +159,6 @@ class CommandsHandler:
         help_string.create_header('You can use following commands:')
         help_string.convert_data_to_table(commands)
         print(help_string)
-
-    def show_all_notes(self):
-        data = self.notebook.show_all_records()
-        if not data:
-            print("\033[4m\033[31m{}\033[0m".format
-                  ('The notebook is empty.'))
-        else:
-            for title, record in data.items():
-                rec_data = record.formatting_record(record)
-                print(Fore.GREEN + f"|Title: {title}\n"
-                      f"|Text: {rec_data['text']}\n"
-                      f"|Tag: {rec_data['#tag']}\n")
                 
     def show_all(self):
         """shows the entire Notebook"""
