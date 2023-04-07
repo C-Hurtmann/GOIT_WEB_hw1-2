@@ -4,6 +4,7 @@ from colorama import Fore, Style, init
 from prettytable import PrettyTable
 
 from sublayers.addressbook import TableOutput, HelpOutput
+
 init(autoreset=True)
 
 
@@ -11,13 +12,13 @@ class Notebook(UserDict):
     _instance = None
     """Storage for Notes. Saves after any changes. Loads after entering in sublayer
     """
-    def __new__(cls, *args, **kwargs):
 
+    def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    file_name = 'Notebook.bin'
+    file_name = "Notebook.bin"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,21 +31,21 @@ class Notebook(UserDict):
         self.data[record.title.value] = record
 
     def save_notes(self):
-        with open(self.file_name, 'wb') as file:
+        with open(self.file_name, "wb") as file:
             pickle.dump(self.data, file)
-        print(Style.BRIGHT+Fore.YELLOW+f'Your notes are saved!')
+        print(Style.BRIGHT + Fore.YELLOW + f"Your notes are saved!")
 
     def load_notes(self):
         try:
-            with open(self.file_name, 'rb') as file:
+            with open(self.file_name, "rb") as file:
                 self.data = pickle.load(file)
         except:
             return
 
 
 class Record:
-    """Keeps all info about note
-    """
+    """Keeps all info about note"""
+
     def __init__(self, title=None, text=None, tag=None):
         self.title = title
         self.text = text
@@ -74,17 +75,17 @@ class Record:
         record.title = title
 
     def formatting_record(self, record):
-        title = getattr(record, 'title', '')
+        title = getattr(record, "title", "")
         if title:
             title_value = title.value
         else:
             title_value = "not found"
-        text = getattr(record, 'text', '')
+        text = getattr(record, "text", "")
         if text:
             text_value = text.value
         else:
             text_value = "not found"
-        tags = getattr(record, 'tags', '')
+        tags = getattr(record, "tags", "")
         if tags:
             tag_value = [tag.value for tag in tags]
         else:
@@ -100,9 +101,9 @@ class Field:
     @property
     def value(self):
         return self._value
-    
+
     def __str__(self):
-        return f'{self._value}'
+        return f"{self._value}"
 
 
 class Title(Field):
@@ -152,75 +153,85 @@ class CommandsHandler:
         record.create_tag(record=record, user_tag=user_tag)
         self.notebook.add_record(record)
         self.notebook.save_notes()
-        
+
     def get_help(self):
         """Shows all commands for the sublayer"""
         help_string = HelpOutput()
-        help_string.create_header('You can use following commands:')
+        help_string.create_header("You can use following commands:")
         help_string.convert_data_to_table(commands)
         print(help_string)
-                
+
     def show_all(self):
         """shows the entire Notebook"""
         data = self.notebook.data
         table = NoteBookDataOutput()
-        table.create_header(['Title', 'Text', 'Tags'])
+        table.create_header(["Title", "Text", "Tags"])
         table.convert_data_to_table(data)
         print(table)
 
     def find_note(self):
         """find note in Notebook"""
-        find_user = input(Style.BRIGHT+Fore.BLUE + 'Enter title or #tag: ')
+        find_user = input(Style.BRIGHT + Fore.BLUE + "Enter title or #tag: ")
         data = self.notebook.show_all_records()
         if not data:
-            print("\033[4m\033[31m{}\033[0m".format
-                  ('The notebook is empty.'))
+            print("\033[4m\033[31m{}\033[0m".format("The notebook is empty."))
         else:
             flag = False
             for title, record in data.items():
                 rec_data = record.formatting_record(record)
                 if title.startswith(find_user):
                     flag = True
-                    print("\033[3m\033[35m{}\033[0m".format(f"|Title: {title}\n"
-                          f"|Text: {rec_data['text']}\n"
-                                                            f"|Tag: {rec_data['#tag']}\n"))
-                tags = getattr(record, 'tags', '')
+                    print(
+                        "\033[3m\033[35m{}\033[0m".format(
+                            f"|Title: {title}\n"
+                            f"|Text: {rec_data['text']}\n"
+                            f"|Tag: {rec_data['#tag']}\n"
+                        )
+                    )
+                tags = getattr(record, "tags", "")
                 if tags:
                     for tag in tags:
                         if tag.value.startswith(find_user):
                             flag = True
-                            print("\033[3m\033[35m{}\033[0m".format(f"|Title: {title}\n"
-                                  f"|Text: {rec_data['text']}\n"
-                                                                    f"|Tag: {rec_data['#tag']}\n"))
+                            print(
+                                "\033[3m\033[35m{}\033[0m".format(
+                                    f"|Title: {title}\n"
+                                    f"|Text: {rec_data['text']}\n"
+                                    f"|Tag: {rec_data['#tag']}\n"
+                                )
+                            )
             if not flag:
-                print(Style.BRIGHT+Fore.RED +
-                      'Note with this title or #tag was not found.')
+                print(
+                    Style.BRIGHT
+                    + Fore.RED
+                    + "Note with this title or #tag was not found."
+                )
 
     def sort_notes_by_tag(self):
         """sorts notes by tags in Notebook"""
         notes_tag = []
         notes_without_tag = []
         for name, record in self.notebook.items():
-            if getattr(record, 'tags', ''):
+            if getattr(record, "tags", ""):
                 notes_tag.append(record)
             else:
                 notes_without_tag.append(record)
-        sortedDictWithTag = sorted(notes_tag, key=lambda x: len(x.tags),
-                                   reverse=True)
+        sortedDictWithTag = sorted(notes_tag, key=lambda x: len(x.tags), reverse=True)
         sortedDictWithTag.extend(notes_without_tag)
         for res in sortedDictWithTag:
             rec_data = record.formatting_record(res)
-            print(Fore.GREEN + f"|Title: {rec_data['title']}\n"
-                               f"|Text: {rec_data['text']}\n"
-                               f"|Tag: {rec_data['#tag']}\n")
+            print(
+                Fore.GREEN + f"|Title: {rec_data['title']}\n"
+                f"|Text: {rec_data['text']}\n"
+                f"|Tag: {rec_data['#tag']}\n"
+            )
 
     def change_note(self):
         """change a note in Notebook"""
-        change_user = input(Style.BRIGHT + Fore.CYAN + 'Enter title of note: ')
+        change_user = input(Style.BRIGHT + Fore.CYAN + "Enter title of note: ")
         data = self.notebook.show_all_records()
         if not data:
-            print("\033[4m\033[31m{}\033[0m".format
-                  ('The Notebook is empty.'))
+            print("\033[4m\033[31m{}\033[0m".format("The Notebook is empty."))
         else:
             flag = False
             update_title_data = {}
@@ -228,62 +239,63 @@ class CommandsHandler:
                 if title.startswith(change_user):
                     flag = True
                     change_commands = PrettyTable()
-                    change_commands.field_names = \
-                        [Style.BRIGHT + Fore.CYAN +
-                         "Command entry", "Command value"]
+                    change_commands.field_names = [
+                        Style.BRIGHT + Fore.CYAN + "Command entry",
+                        "Command value",
+                    ]
                     change_commands.add_row(
-                        [Style.BRIGHT + Fore.CYAN +
-                         "Press 1", "Add tag"])
+                        [Style.BRIGHT + Fore.CYAN + "Press 1", "Add tag"]
+                    )
                     change_commands.add_row(
-                        [Style.BRIGHT + Fore.CYAN +
-                         "Press 2", "Change title of note"])
+                        [Style.BRIGHT + Fore.CYAN + "Press 2", "Change title of note"]
+                    )
                     change_commands.add_row(
-                        [Style.BRIGHT + Fore.CYAN +
-                         "Press 3", "Change text"])
+                        [Style.BRIGHT + Fore.CYAN + "Press 3", "Change text"]
+                    )
                     change_commands.add_row(
-                        [Style.BRIGHT + Fore.CYAN +
-                         "Press 4", "Change tags"])
+                        [Style.BRIGHT + Fore.CYAN + "Press 4", "Change tags"]
+                    )
                     print(change_commands)
                     change = int(
-                        input(Style.BRIGHT + Fore.CYAN + 'Enter your choice: '))
+                        input(Style.BRIGHT + Fore.CYAN + "Enter your choice: ")
+                    )
                     if change == 1:
-                        tag_add = input(
-                            Style.BRIGHT + Fore.CYAN + 'Enter a tag: ')
-                        record.create_tag(record=record, user_tag=tag_add,
-                                          update=False)
-                        print(Style.BRIGHT + Fore.YELLOW +
-                              f'In note {title} append '
-                              f'{[tag.value for tag in record.tags]}')
+                        tag_add = input(Style.BRIGHT + Fore.CYAN + "Enter a tag: ")
+                        record.create_tag(record=record, user_tag=tag_add, update=False)
+                        print(
+                            Style.BRIGHT + Fore.YELLOW + f"In note {title} append "
+                            f"{[tag.value for tag in record.tags]}"
+                        )
                     elif change == 2:
                         new_title = input(
-                            Style.BRIGHT+Fore.CYAN + 'Enter a new title: ')
+                            Style.BRIGHT + Fore.CYAN + "Enter a new title: "
+                        )
                         record.title = Title(new_title)
                         update_title_data[title] = new_title
-                        print(Style.BRIGHT + Fore.YELLOW +
-                              f'In note title {title} was changed to '
-                              f'{record.title.value}')
+                        print(
+                            Style.BRIGHT
+                            + Fore.YELLOW
+                            + f"In note title {title} was changed to "
+                            f"{record.title.value}"
+                        )
                     elif change == 3:
-                        text = input(Style.BRIGHT + Fore.CYAN +
-                                     'Enter a new text: ')
-                        record.create_text(
-                            record=record, user_text=text)
-                        print(Style.BRIGHT + Fore.YELLOW +
-                              f'In note {title} change text '
-                              f'{record.text.value}')
+                        text = input(Style.BRIGHT + Fore.CYAN + "Enter a new text: ")
+                        record.create_text(record=record, user_text=text)
+                        print(
+                            Style.BRIGHT + Fore.YELLOW + f"In note {title} change text "
+                            f"{record.text.value}"
+                        )
                     elif change == 4:
-                        tag_add = input(
-                            Style.BRIGHT + Fore.CYAN + 'Enter a tag: ')
-                        record.create_tag(record=record, user_tag=tag_add,
-                                          update=True)
-                        print(Style.BRIGHT + Fore.YELLOW +
-                              f'In note {title} update '
-                              f'{[tag.value for tag in record.tags]}')
+                        tag_add = input(Style.BRIGHT + Fore.CYAN + "Enter a tag: ")
+                        record.create_tag(record=record, user_tag=tag_add, update=True)
+                        print(
+                            Style.BRIGHT + Fore.YELLOW + f"In note {title} update "
+                            f"{[tag.value for tag in record.tags]}"
+                        )
                     else:
-                        print(Style.BRIGHT+Fore.RED +
-                              f'{change} invalid choice')
+                        print(Style.BRIGHT + Fore.RED + f"{change} invalid choice")
             for title, new_title in update_title_data.items():
-                self.notebook.data[new_title] = \
-                    self.notebook.data.pop(title)
+                self.notebook.data[new_title] = self.notebook.data.pop(title)
             if flag:
                 self.notebook.save_notes()
 
@@ -292,66 +304,71 @@ class CommandsHandler:
         remove_commands = PrettyTable()
         remove_commands.field_names = ["Command entry", "Command value"]
         remove_commands.add_row(["del", "Delete one selected note"])
-        remove_commands.add_row(["del all",
-                                 "Delete all notes in Notebook"])
+        remove_commands.add_row(["del all", "Delete all notes in Notebook"])
         print("\033[1m\033[31m{}\033[0m".format(remove_commands))
-        remove_date = input(Style.BRIGHT + Fore.RED + 'Enter your choice: ')
-        if remove_date == 'del':
-            remove_note = input(Style.BRIGHT + Fore.YELLOW +
-                                'Enter a title of the note to be deleted: ')
+        remove_date = input(Style.BRIGHT + Fore.RED + "Enter your choice: ")
+        if remove_date == "del":
+            remove_note = input(
+                Style.BRIGHT + Fore.YELLOW + "Enter a title of the note to be deleted: "
+            )
             self.notebook.data.pop(remove_note)
-            print(Style.BRIGHT + Fore.RED + f'Note {remove_note} deleted.')
-        elif remove_date == 'del all':
-            print(Style.BRIGHT + Fore.RED +
-                  f'Are you sure you want to clear the Notebook?')
-            question = input(Style.BRIGHT + Fore.RED +
-                             'Y or N: ').lower().strip()
-            if question == 'n':
+            print(Style.BRIGHT + Fore.RED + f"Note {remove_note} deleted.")
+        elif remove_date == "del all":
+            print(
+                Style.BRIGHT
+                + Fore.RED
+                + f"Are you sure you want to clear the Notebook?"
+            )
+            question = input(Style.BRIGHT + Fore.RED + "Y or N: ").lower().strip()
+            if question == "n":
                 return
-            elif question == 'y':
+            elif question == "y":
                 self.notebook.data.clear()
         self.notebook.save_notes()
-        
+
     def get_back(self):
         """Back to main menu"""
         pass
 
 
 class NoteBookDataOutput(TableOutput):
-    
     def create_header(self, column_names):
         self.table = PrettyTable(column_names)
-    
+
     def convert_data_to_table(self, data):
         for i in data.values():
-            tags ='\n'.join(map(str, i.tags))
+            tags = "\n".join(map(str, i.tags))
             self.table.add_row([i.title, i.text, tags])
-    
+
     def __str__(self):
-        return f'{self.table}'
+        return f"{self.table}"
+
+
 # ------------------------------------------------ADAPTER-------------------------------------------------------
-help = ('|You can use following commands:\n'
-        '|add - add a new note in Notebook\n'
-        '|del - delete a note from Notebook\n'
-        '|change - change a note in Notebook\n'
-        '|find - find note in Notebook\n'
-        '|tag sort - sorts notes by tags in Notebook\n'
-        '|show all - shows the entire Notebook\n'
-        '|back - Closing the sublayer\n')
+help = (
+    "|You can use following commands:\n"
+    "|add - add a new note in Notebook\n"
+    "|del - delete a note from Notebook\n"
+    "|change - change a note in Notebook\n"
+    "|find - find note in Notebook\n"
+    "|tag sort - sorts notes by tags in Notebook\n"
+    "|show all - shows the entire Notebook\n"
+    "|back - Closing the sublayer\n"
+)
 
-commands = {'add': CommandsHandler().add_note,
-            'help': CommandsHandler().get_help,
-            'del': CommandsHandler().remove_note,
-            'change': CommandsHandler().change_note,
-            'find': CommandsHandler().find_note,
-            'tag sort': CommandsHandler().sort_notes_by_tag,
-            'show all': CommandsHandler().show_all,
-            'back': CommandsHandler().get_back}
+commands = {
+    "add": CommandsHandler().add_note,
+    "help": CommandsHandler().get_help,
+    "del": CommandsHandler().remove_note,
+    "change": CommandsHandler().change_note,
+    "find": CommandsHandler().find_note,
+    "tag sort": CommandsHandler().sort_notes_by_tag,
+    "show all": CommandsHandler().show_all,
+    "back": CommandsHandler().get_back,
+}
 
-CONFIG = ({'help': help,
-           'commands': commands})
+CONFIG = {"help": help, "commands": commands}
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     CommandsHandler().get_help()
     CommandsHandler().show_all()
-    
