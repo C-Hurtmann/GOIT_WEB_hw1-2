@@ -1,11 +1,9 @@
 FROM python:3.10
 
-WORKDIR /app
+WORKDIR /GOIT_WEB_hw1
 
 COPY . .
 
 RUN pip install -r requirements.txt
-
-EXPOSE 5000
 
 ENTRYPOINT ["python3", "interface.py"]
