@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5000
 
-ENTRYPOINT ["python3", "bot/interface.py"]
+ENTRYPOINT ["python3", "interface.py"]

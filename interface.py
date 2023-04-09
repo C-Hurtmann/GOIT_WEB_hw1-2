@@ -3,7 +3,6 @@ import inquirer
 from sublayers.addressbook import commands as ab_commands
 from sublayers.notebook import commands as nb_commands
 from sublayers.cleaner import commands as sa_commands
-from sublayers.game import commands as gm_commands
 from sublayers.handler import Handler
 
 
@@ -11,7 +10,7 @@ main_menu = [
     inquirer.List(
         "option",
         message="You are in main menu. Please select an option:",
-        choices=["Address Book", "Note Book", "Sorter Assist", "Games", "Exit"],
+        choices=["Address Book", "Note Book", "Sorter Assist", "Exit"],
     )
 ]
 
@@ -30,10 +29,6 @@ def main():
 
         elif main_choice == "Sorter Assist":
             handler = Handler(sa_commands)
-            handler.run()
-
-        elif main_choice == 'Games':
-            handler = Handler(gm_commands)
             handler.run()
 
         elif main_choice == "Exit":
