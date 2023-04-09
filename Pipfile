@@ -8,6 +8,7 @@ inquirer = "*"
 colorama = "*"
 prettytable = "*"
 jinxed = "*"
+blessed = "*"
 
 [dev-packages]
 pylint = "*"
