@@ -179,7 +179,7 @@ def main():
     color_nibble = term.black_on_green
     color_worm = term.yellow_reverse
     color_head = term.red_reverse
-    color_bg = term.on_blue
+    color_bg = term.on_black
     echo(term.move_yx(1, 1))
     echo(color_bg(term.clear))
 
