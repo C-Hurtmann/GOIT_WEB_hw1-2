@@ -35,8 +35,6 @@ def main():
             print("Exiting program...")
             break
 
-def main():
-    print('There must be chat bot')
 
 if __name__ == "__main__":
     main()
